@@ -14,7 +14,7 @@ SECTION .data
     resBuff     TIMES   buffLen  db  0
 
     lineseplne:
-        db      "-----------------------------------------", 0ah,0ah,0h
+        db      "______________________________________________________________________________________", 0ah,0ah,0h
     lineseplneLen equ   $ - lineseplne
 
     startMsg:
@@ -144,12 +144,22 @@ SECTION .text
         mov     [filePtr],rax           ; Store file descriptor pointer
         mov     rcx,qword 0             ; Initialize counter
 
+        ; _______________________________________________________________________________________________________________________________________
+        ; |                                            SEND HEADER + LOG DATA                                                                    |
+        ; _______________________________________________________________________________________________________________________________________
+
     sendHeaders:                        ; -----------[Send Headers]------------
         mov     rax,1                   ; sys_write()
         mov     rdi,[client]            ; Load client pointer
         mov     rsi,http200             ; Load HTTP 200 Message
         mov     rdx,http200Len          ; Load HTTP 200 Message Length
         syscall                         ; 
+                                        ; -------------[TEXT]----------------
+        mov     rax,1                   ; sys_write()
+        mov     rdi,1                   ; Set to STDOUT
+        mov     rsi,lineseplne          ; Load line separator
+        mov     rdx,lineseplneLen       ; Load line separator length
+        syscall  
 
     readHTML:                           ; ---------[HTML Output Loop]----------
         mov     rax,0                   ; sys_read()
