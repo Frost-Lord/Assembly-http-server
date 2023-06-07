@@ -6,11 +6,16 @@ SECTION .data
     socketOn    dw      1
     client      dq      0
     fileName    db      "index.html", 0h
+    routes      db      "routes"
     filePtr     dq      0
     reqLen      dw      0
     buffLen     equ     512
     reqBuff     TIMES   buffLen  db  0
     resBuff     TIMES   buffLen  db  0
+
+    lineseplne:
+        db      "-----------------------------------------", 0ah,0ah,0h
+    lineseplneLen equ   $ - lineseplne
 
     startMsg:
         db      "Listening on Port 3926 ...",           0ah,0ah,0h
@@ -75,12 +80,30 @@ SECTION .text
         cmp     rax,0                   ; Check for error
         jne     closeServer             ; Close server if error
 
-                                        ; -------------[Listen]----------------
+        ; _______________________________________________________________________________________________________________________________________
+        ; |                                                  LOGGING text                                                                        |
+        ; _______________________________________________________________________________________________________________________________________
+                                        ; -------------[TEXT]----------------
+        mov     rax,1                   ; sys_write()
+        mov     rdi,1                   ; Set to STDOUT
+        mov     rsi,lineseplne          ; Load line separator
+        mov     rdx,lineseplneLen       ; Load line separator length
+        syscall  
+                                        ; -------------[TEXT]----------------
         mov     rax,1                   ; sys_write()
         mov     rdi,1                   ; Set to STDOUT
         mov     rsi,startMsg            ; Load start message
         mov     rdx,startMsgLen         ; Load start message length
+        syscall  
+                                        ; -------------[TEXT]----------------
+        mov     rax,1                   ; sys_write()
+        mov     rdi,1                   ; Set to STDOUT
+        mov     rsi,lineseplne          ; Load line separator
+        mov     rdx,lineseplneLen       ; Load line separator length
         syscall                                
+        ; _______________________________________________________________________________________________________________________________________
+        ; |                                                  SOCKET                                                                              |
+        ; _______________________________________________________________________________________________________________________________________
         mov     rax,50                  ; sys_listen()
         mov     rdi,[socket]            ; Load socket pointer
         mov     rsi,8                   ; Load max clients
