@@ -13,6 +13,23 @@ SECTION .data
     reqBuff     TIMES   buffLen  db  0
     resBuff     TIMES   buffLen  db  0
 
+    http_200 db "HTTP/1.1 200 OK",0x0d,0x0a,0x00
+    http_200_len equ $ - http_200
+    http_206 db "HTTP/1.1 206 Partial Content",0x0d,0x0a,0x00
+    http_206_len equ $ - http_206
+    http_301 db "HTTP/1.1 301 Moved Permanently",0x0d,0x0a,0x00
+    http_301_len equ $ - http_301
+    http_404 db "HTTP/1.1 404 Not Found",0x0d,0x0a,0x00
+    http_404_len equ $ - http_404
+    http_404_text db "I'm sorry, Dave. I'm afraid I can't do that. 404 Not Found",0x00
+    http_404_text_len equ $ - http_404_text
+    http_400 db "HTTP/1.1 400 Bad Request",0x0d,0x0a,0x00
+    http_400_len equ $ - http_400
+    http_413 db "HTTP/1.1 413 Request Entity Too Large",0x0d,0x0a,0x00
+    http_413_len equ $ - http_413
+    http_416 db "HTTP/1.1 416 Requested Range Not Satisfiable",0x0d,0x0a,0x00
+    http_416_len equ $ - http_416
+
     lineseplne:
         db      "______________________________________________________________________________________", 0ah,0ah,0h
     lineseplneLen equ   $ - lineseplne
@@ -135,25 +152,35 @@ SECTION .text
         syscall                         ;
 
                                         ; ----------[Read Index.html]----------
-        mov     rax,2                   ; sys_open()
-        mov     rdi,fileName            ; Set file name to open
-        mov     rsi,0                   ; Set file read only
-        syscall                         ; Return new file descriptor rax
-        cmp     rax,0                   ; Check if error - 404 Error
-        jle     closeClient             ; Close client if error
-        mov     [filePtr],rax           ; Store file descriptor pointer
-        mov     rcx,qword 0             ; Initialize counter
+    mov     rax,2                   ; sys_open()
+    mov     rdi,fileName            ; Set file name to open
+    mov     rsi,0                   ; Set file read only
+    syscall                         ; Return new file descriptor rax
+    cmp     rax,0                   ; Check if error - 404 Error
+    jl      send404                 ; Send 404 if error
+    mov     [filePtr],rax           ; Store file descriptor pointer
+    mov     rcx,qword 0             ; Initialize counter
+    jmp     sendHeaders             ; Jump to sendHeaders on successful open
+
+send404:
+    mov     rax,1                   ; sys_write()
+    mov     rdi,[client]            ; Load client pointer
+    mov     rsi,http_404            ; Load HTTP 404 Message
+    mov     rdx,http_404_len        ; Load HTTP 404 Message Length
+    syscall
+    jmp     closeClient             ; Close client after error
 
         ; _______________________________________________________________________________________________________________________________________
         ; |                                            SEND HEADER + LOG DATA                                                                    |
         ; _______________________________________________________________________________________________________________________________________
 
-    sendHeaders:                        ; -----------[Send Headers]------------
-        mov     rax,1                   ; sys_write()
-        mov     rdi,[client]            ; Load client pointer
-        mov     rsi,http200             ; Load HTTP 200 Message
-        mov     rdx,http200Len          ; Load HTTP 200 Message Length
-        syscall                         ; 
+
+sendHeaders:                        ; -----------[Send Headers]------------
+    mov     rax,1                   ; sys_write()
+    mov     rdi,[client]            ; Load client pointer
+    mov     rsi,http200             ; Load HTTP 200 Message
+    mov     rdx,http200Len          ; Load HTTP 200 Message Length
+    syscall                         ; 
                                         ; -------------[TEXT]----------------
         mov     rax,1                   ; sys_write()
         mov     rdi,1                   ; Set to STDOUT
