@@ -18,16 +18,12 @@ http_206 db "HTTP/1.1 206 Partial Content",0x0d,0x0a,0x00
     http_206_len equ $ - http_206
 
 http_301 db "HTTP/1.1 301 Moved Permanently",0x0d,0x0a,0x00
-
     http_301_len equ $ - http_301
 
-    http_404 db "HTTP/1.1 404 Not Found",0x0d,0x0a,0x00
+http_404 db "HTTP/1.1 404 Not Found",0x0d,0x0a,0x00
     http_404_len equ $ - http_404
 
 http_400 db "HTTP/1.1 400 Bad Request",0x0d,0x0a,0x00
-    http_404_text_len equ $ - http_404_text
-
-    http_400 db "HTTP/1.1 400 Bad Request",0x0d,0x0a,0x00
     http_400_len equ $ - http_400
 
 http_413 db "HTTP/1.1 413 Request Entity Too Large",0x0d,0x0a,0x00
@@ -36,29 +32,27 @@ http_413 db "HTTP/1.1 413 Request Entity Too Large",0x0d,0x0a,0x00
 http_416 db "HTTP/1.1 416 Requested Range Not Satisfiable",0x0d,0x0a,0x00
     http_416_len equ $ - http_416
 
-    lineseplne:
-        db      "______________________________________________________________________________________", 0ah,0ah,0h
-    lineseplneLen equ   $ - lineseplne
+lineseplne:
+    db      "______________________________________________________________________________________", 0ah,0ah,0h
+lineseplneLen equ   $ - lineseplne
 
-    startMsg:
-        db      "Listening on Port 3926 ...",           0ah,0ah,0h
-    startMsgLen equ     $ - startMsg
+startMsg:
+    db      "Listening on Port 3926 ...",           0ah,0ah,0h
+startMsgLen equ     $ - startMsg
 
 http200:
     db      "HTTP/1.1 200 OK",                      0ah
     db      "Date: xxx, xx xxx xxxx xx:xx:xx xxx",  0ah
     db      "Server: HTTP-ASM64",                   0ah
     db      "Content-Type: text/html",              0ah,0ah,0h
-
-    http200Len  equ     $ - http200
+http200Len  equ     $ - http200
 
 http404:     
     db      "HTTP/1.1 404 Not Found",               0ah
     db      "Date: xxx, xx xxx xxxx xx:xx:xx xxx",  0ah
     db      "Server: HTTP-ASM64",                   0ah
     db      "Content-Type: text/html",              0ah,0ah,0
-
-    http404Len  equ     $ - http404
+http404Len  equ     $ - http404
 
 SECTION .bss
     socketAddr  resq    2
