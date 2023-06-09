@@ -179,8 +179,6 @@ jmp     sendHeaders             ; Jump to sendHeaders on successful open
     endCopyRoute:
         mov byte [rsi], 0x00     ; null terminate the route string
 
-; now fileName contains the route extracted from the request
-; we need to concatenate this with the base directory which is "./routes/"
 lea rsi, [fileName]       ; route
 lea rdi, [routes]        ; base directory
 

@@ -6,7 +6,7 @@ Ubuntu
 ```
 nasm -f elf64 server.asm && ld -o server server.o && ./server
 ```
-
+or
 ```
 make build && ./server
 ```
